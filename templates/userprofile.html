@@ -1,4 +1,24 @@
 {% extends 'main.html' %} 
+{% block 'meta' %}
+  <title>Opret Oplæg</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <style>
+    .wrap{
+        width: 300px;
+        margin:30px auto;
+        display: grid;
+        grid-gap: 50px;
+        grid-template-columns: 300px auto;
+    }
+    
+    #mapWrap{
+        width: 100%;
+        height: 200px;
+        border-radius: 10px;
+    }
+  </style>
+{% endblock %}
 {% block 'content' %}
   {% if user %}
   <h1><img height="50px" src="/static/gfx/brugerprofil.jpeg"/> {{ user }}'s profil</h1>
@@ -24,6 +44,47 @@
       {% endfor %}
      </ul>
     </div>
+    <div class="container">
+      <h2>Indsamlingssteder</h2>
+        <p>
+          <div id="mapWrap"></div>
+        </p>
+    </div>
   </div>
+  <script>
+    // Define multiple markers location, latitude, and longitude
+    const locations = [{% for post in posts %}
+        ['{{ post.myWhen }}: <br/>Har samlet {{ post.myWeight }} kg. {{ post.myWhat }}', {{ post.myWhereLat }}, {{ post.myWhereLon }}],{% endfor %}
+    ];
+    
+    // Set container element to embed map
+    const map = L.map('mapWrap').setView([locations[0][1], locations[0][2]], 8);
+    
+    // Add copyright attribution
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png?{foo}', {
+        foo: 'bar',
+        attribution:'&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'}
+    ).addTo(map);
+    
+    // Add multiple markers to map
+    for (var i = 0; i < locations.length; i++) {
+        marker = new L.marker(
+            [locations[i][1], locations[i][2]]
+        )
+        .bindPopup(locations[i][0])
+        .addTo(map);
+    
+        // Set zoom level on marker click
+        marker.on('click', function(mrk) {
+            map.setView(
+                [
+                    mrk.latlng.lat,
+                    mrk.latlng.lng
+                ],
+                14
+            );
+        });
+    }
+  </script>
   {% endif %}
 {% endblock %}
