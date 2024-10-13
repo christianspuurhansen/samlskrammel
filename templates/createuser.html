@@ -1,0 +1,12 @@
+{% extends 'main.html' %} 
+{% block 'content' %}
+  <h1>Opret Bruger</h1>
+  {% if error %}
+  <p color=red>{{error}}</p>
+  {% endif %}
+  <form action="/samlskrammel/opret-bruger" method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <input type="submit" value="OK">
+  </form>
+{% endblock %}

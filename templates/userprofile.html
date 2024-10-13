@@ -1,0 +1,29 @@
+{% extends 'main.html' %} 
+{% block 'content' %}
+  {% if user %}
+  <h1><img height="50px" src="/static/gfx/brugerprofil.jpeg"/> {{ user }}'s profil</h1>
+  <div class="parrent">
+    <div class="container">
+      <h2>Seneste Oplæg</h2>
+      <ul class="friends-list">
+      {% for post in posts %}
+        <li>
+          {% if post.myImage %}
+          <img src="/{{ post.myImage }}" height=60px;/><br/>
+          {% endif %}
+          {{ post.myWhen }}: <br/>Har samlet {{ post.myWeight }} kg. {{ post.myWhat }}
+        </li>
+      {% endfor %}
+      </ul>
+    </div>
+    <div class="container">
+      <h2>Venners Indsamling</h2>
+      <ul class="friends-list">
+      {% for friend in friends %}
+       <li>{{friend.myOwner__username}} har samlet {{friend.collected|floatformat:2}} kg. i alt.</li>
+      {% endfor %}
+     </ul>
+    </div>
+  </div>
+  {% endif %}
+{% endblock %}

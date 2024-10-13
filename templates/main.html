@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body {
+            background-color: black;
+            color: white;
+            font-family: arial, sans-serif;
+            text-align: center;
+            margin: 0;
+            padding: 0;
+        }
+        h1 {
+            margin-top: 50px;
+        }
+        .container {
+            margin-top: 50px;
+        }
+        .friends-list, .posts {
+            list-style-type: none;
+            padding: 0;
+        }
+        .friends-list li, .posts li {
+            margin: 10px 0;
+        }
+        .navbar {
+          width: 100%;
+          background-color: #111;
+          overflow: auto;
+        }
+        
+        .navbar a {
+          float: left;
+          padding: 12px;
+          color: white;
+          text-decoration: none;
+          font-size: 17px;
+        }
+        
+        .navbar a:hover {
+          background-color: #113;
+        }
+        
+        .active {
+          background-color: #115;
+        }
+        
+        @media screen and (max-width: 500px) {
+          .navbar a {
+            float: none;
+            display: block;
+          }
+        }
+    </style>
+  {% block 'meta' %}
+  {% endblock %}
+</head>
+<body>
+  <div class="navbar">
+    <a class="active" href="/samlskrammel/"><i class="Samlskrammel"></i>SamlSkrammel</a> 
+    {% if user %}
+    <a href="/samlskrammel/opret-oplæg"><i class=""></i>Opret Oplæg</a> 
+    <a href="/samlskrammel/tilføj-ven"><i class=""></i>Tilføj Ven</a> 
+    <a href="/samlskrammel/log-ud"><i class=""></i>Log Ud</a> 
+    {% endif %}
+    {% if not user %}
+    <a href="/samlskrammel/log-på"><i class=""></i>Log På</a> 
+    <a href="/samlskrammel/opret-bruger"><i class=""></i>Opret Bruger</a>
+    {% endif %}
+  </div>
+  {% if error %}
+  <p style="color:red;">{{error}}</p>
+  {% endif %}
+  {% block 'content' %}
+  {% endblock %}
+</body>
+</html>

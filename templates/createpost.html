@@ -1,0 +1,75 @@
+{% extends 'main.html' %} 
+{% block 'meta' %}
+  <title>Opret Oplæg</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css"/>
+  <style>
+    .wrap{
+        width: 300px;
+        margin:30px auto;
+        display: grid;
+        grid-gap: 50px;
+        grid-template-columns: 300px auto;
+    }
+    
+    #map{
+        width: 100%;
+        height: 200px;
+        border-radius: 10px;
+    }
+  </style>
+{% endblock %}
+{% block 'content' %}
+  <h1>Opret Oplæg</h1>
+  {% if error %}
+  <p color=red>{{error}}</p>
+  {% endif %}
+  <div class="wrap">
+    <form action="/samlskrammel/opret-oplæg" method="post" enctype="multipart/form-data">
+      {% csrf_token %}
+      {{ form.as_p }}
+      <p>
+        <div id="map"></div>
+      </p>
+      <input type="submit" value="OK">
+    </form>
+  </div>
+  <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+  <script type="text/javascript">
+    let myLat=55.6;
+    let myLon=12.6;
+    function savePosition(position) {
+      myX=position.coords.latitude;
+      myLon=position.coords.longitude;
+      document.getElementById('id_field_lat').value = position.coords.latitude;
+      document.getElementById('id_field_lon').value = position.coords.longitude;
+    }
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(savePosition);
+    }
+
+    let mapOptions = {
+        center:[myLat, myLon],
+        zoom:10
+    }
+    
+    let map = new L.map('map' , mapOptions);
+    
+    let layer = new L.TileLayer('http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png');
+    map.addLayer(layer);
+    
+    
+    let marker = null;
+    map.on('click', (event)=> {
+    
+        if(marker !== null){
+            map.removeLayer(marker);
+        }
+    
+        marker = L.marker([event.latlng.lat , event.latlng.lng]).addTo(map);
+    
+        document.getElementById('id_field_lat').value = event.latlng.lat;
+        document.getElementById('id_field_lon').value = event.latlng.lng;
+    
+    })
+  </script>
+{% endblock %}
