@@ -15,3 +15,7 @@ class CreatePostForm(forms.Form):
   field_image = forms.ImageField(label='Billede af indsamling', required=False)
   field_lat = forms.DecimalField(label='Opsamlings breddegrad')
   field_lon = forms.DecimalField(label='Opsamlings højdegrad')
+
+class TilfoejVen(forms.Form):
+    friend_name = forms.CharField(label="Vens Brugernavn", max_length=100)
+

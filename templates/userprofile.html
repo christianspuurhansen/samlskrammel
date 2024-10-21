@@ -8,7 +8,7 @@
         width: 300px;
         margin:30px auto;
         display: grid;
-        grid-gap: 50px;
+        grid-gap: 0px;
         grid-template-columns: 300px auto;
     }
     
@@ -44,7 +44,7 @@
       {% endfor %}
      </ul>
     </div>
-    <div class="container">
+    <div class="wrap">
       <h2>Indsamlingssteder</h2>
         <p>
           <div id="mapWrap"></div>
@@ -58,7 +58,7 @@
     ];
     
     // Set container element to embed map
-    const map = L.map('mapWrap').setView([locations[0][1], locations[0][2]], 8);
+    const map = L.map('mapWrap').setView([locations[0][1], locations[0][2]], 10);
     
     // Add copyright attribution
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png?{foo}', {

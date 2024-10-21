@@ -3,7 +3,7 @@
 # Create your views here.
 from django.http import HttpResponse
 from django.shortcuts import render
-from .forms import CreateUserForm, LoginForm, CreatePostForm
+from .forms import CreateUserForm, LoginForm, CreatePostForm, TilfoejVen
 from django.contrib.auth.models import User
 from .models import Post, Friend
 from django.utils import timezone
@@ -93,7 +93,6 @@ def opret_oplaeg(request):
                                                 'error': 'Fejl i post',
                                                 'user': u})
     else:
-      print(str(request.FILES))
       post=Post(myWhat=form.cleaned_data["field_what"],
                 myWeight=form.cleaned_data["field_weight"],
                 myWhen=timezone.now(),
@@ -112,9 +111,38 @@ def tilfoej_ven(request):
   if not User.objects.filter(id=request.session["member_id"]).exists():
     return render(request,'userprofile.html',{'user': None, 'error': 'Session afsluttet.'})
   u=User.objects.get(id=request.session["member_id"])
-  return render(request,'message.html',{'message': 'Funktion ikke tilgængelig endnu...',
-                                        'dest': '/samlskrammel/',
-                                        'user': u.username})
+  if request.method!="POST":
+    form=TilfoejVen()
+    return render(request,'submitform.html', {'form': form,
+                                              'dest': '/samlskrammel/tilføj-ven',
+                                              'title': 'Tilføj ven',
+                                              'user': u})
+  else:
+    form = TilfoejVen(request.POST,request.FILES)
+    if not form.is_valid():
+      return render(request,'submitform.html', {'form': form,
+                                                'dest': '/samlskrammel/tilføj-ven',
+                                                'title': 'Tilføj ven',
+                                                'error': 'Fejl i input',
+                                                'user': u})
+    if not User.objects.filter(username=form.cleaned_data["friend_name"]).exists():
+      return render(request,'submitform.html', {'form': form,
+                                                'dest': '/samlskrammel/tilføj-ven',
+                                                'title': 'Tilføj ven',
+                                                'error': 'Kunne ikke finde brugeren '+str(form.cleaned_data["friend_name"]),
+                                                'user': u})
+    ven=User.objects.get(username=form.cleaned_data["friend_name"])
+    if Friend.objects.filter(myOwner=u, myFriend=ven).exists():
+      return render(request,'submitform.html', {'form': form,
+                                                'dest': '/samlskrammel/tilføj-ven',
+                                                'title': 'Tilføj ven',
+                                                'error': str(form.cleaned_data["friend_name"])+' er allerede i din venneliste',
+                                                'user': u})
+    venskab=Friend(myFriend=ven,myOwner=u)
+    venskab.save()
+    return render(request,'message.html',{'message': str(form.cleaned_data["friend_name"])+' er nu i din venneliste.',
+                                          'dest': '/samlskrammel/',
+                                          'user': u})
 
 def index(request):
   if not request.session.has_key('member_id'):
@@ -122,6 +150,7 @@ def index(request):
   if not User.objects.filter(id=request.session["member_id"]).exists():
     return render(request,'userprofile.html',{'user': None, 'error': 'Session afsluttet.'})
   u=User.objects.get(id=request.session["member_id"])
+  venner=Friend.objects.filter(myOwner=u).values('myFriend')
   return render(request,'userprofile.html',{'user': u.username,
-                                            'friends': Post.objects.values('myOwner__username').annotate(collected=Sum('myWeight')).order_by('-collected')[:10],
+                                            'friends': Post.objects.filter(myOwner__in=venner).values('myOwner__username').annotate(collected=Sum('myWeight')).order_by('-collected')[:10],
                                             'posts': Post.objects.filter(myOwner=u).order_by('-myWhen')[:5]})
