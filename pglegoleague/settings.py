@@ -125,4 +125,4 @@ STATICFILES_DIRS=(BASE_DIR/'static',
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-GOOGLE_API_KEY = 'AIzaSyAkRISuG2_HDKdR7FG6b-9WN06jI-Qzpek'
+GOOGLE_API_KEY = '...'

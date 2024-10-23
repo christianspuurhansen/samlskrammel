@@ -144,13 +144,32 @@ def tilfoej_ven(request):
                                           'dest': '/samlskrammel/',
                                           'user': u})
 
+def leaderboard(request):
+  if not request.session.has_key('member_id'):
+    return render(request,'userprofile.html',{'user': None})
+  if not User.objects.filter(id=request.session["member_id"]).exists():
+    return render(request,'userprofile.html',{'user': None, 'error': 'Session afsluttet.'})
+  u=User.objects.get(id=request.session["member_id"])
+  return render(request,'leaderboard.html',{'user': u.username,
+                                            'leaders': Post.objects.values('myOwner__username').annotate(collected=Sum('myWeight')).order_by('-collected')[:100]
+                                           })
+
 def index(request):
   if not request.session.has_key('member_id'):
     return render(request,'userprofile.html',{'user': None})
   if not User.objects.filter(id=request.session["member_id"]).exists():
     return render(request,'userprofile.html',{'user': None, 'error': 'Session afsluttet.'})
   u=User.objects.get(id=request.session["member_id"])
-  venner=Friend.objects.filter(myOwner=u).values('myFriend')
-  return render(request,'userprofile.html',{'user': u.username,
+  # Determine which user to view
+  profile=u.username
+  if request.GET.__contains__('brugernavn'):
+    profile=request.GET['brugernavn']
+  if not User.objects.filter(username=profile).exists():
+    return render(request,'userprofile.html',{'user': None, 'error': 'Brugernavnet '+str(profile)+' findes ikke.'})
+  p=User.objects.get(username=profile)
+  venner=Friend.objects.filter(myOwner=p).values('myFriend')
+  return render(request,'userprofile.html',{'user': u,
+                                            'profile': p,
+                                            'admin': p.is_superuser,
                                             'friends': Post.objects.filter(myOwner__in=venner).values('myOwner__username').annotate(collected=Sum('myWeight')).order_by('-collected')[:10],
-                                            'posts': Post.objects.filter(myOwner=u).order_by('-myWhen')[:5]})
+                                            'posts': Post.objects.filter(myOwner=p).order_by('-myWhen')[:5]})

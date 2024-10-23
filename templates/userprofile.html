@@ -21,7 +21,7 @@
 {% endblock %}
 {% block 'content' %}
   {% if user %}
-  <h1><img height="50px" src="/static/gfx/brugerprofil.jpeg"/> {{ user }}'s profil</h1>
+  <h1><img height="50px" src="/static/gfx/brugerprofil.jpeg"/> {% if admin %}<span style="color: yellow;">{% endif %}{{ profile }}'s{% if admin %}</span>{% endif %} profil</h1>
   <div class="parrent">
     <div class="container">
       <h2>Seneste Oplæg</h2>
@@ -40,7 +40,7 @@
       <h2>Venners Indsamling</h2>
       <ul class="friends-list">
       {% for friend in friends %}
-       <li>{{friend.myOwner__username}} har samlet {{friend.collected|floatformat:2}} kg. i alt.</li>
+       <li><a href="/samlskrammel/?brugernavn={{friend.myOwner__username}}">{{friend.myOwner__username}}</a> har samlet {{friend.collected|floatformat:2}} kg. i alt.</li>
       {% endfor %}
      </ul>
     </div>
